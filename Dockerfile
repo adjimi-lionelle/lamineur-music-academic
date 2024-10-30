@@ -1,16 +1,14 @@
 # Utiliser PHP-FPM 8.2
 FROM php:8.2-fpm
 
-# Installer les dépendances nécessaires et Nginx
+# Installer les dépendances nécessaires
 RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     g++ \
     git \
     libicu-dev \
     zip \
-    unzip \
-    nginx \
-    && rm -rf /var/lib/apt/lists/*
+    unzip
 
 # Installer les extensions PHP requises
 RUN docker-php-ext-install intl pdo pdo_mysql
@@ -24,18 +22,15 @@ WORKDIR /var/www
 # Copier le code de l'application dans le conteneur
 COPY . /var/www
 
-# Copier la configuration Nginx (assure-toi que le fichier existe)
-COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+# Copier le script d'entrée
+COPY docker/script.sh /var/www/docker/script.sh
 
-# Donner les permissions appropriées aux fichiers
-RUN chown -R www-data:www-data /var/www
+# Donner les permissions appropriées aux fichiers, y compris le script
+RUN chmod +x /var/www/docker/script.sh
 
-# Installer les dépendances PHP avec Composer
-#RUN composer install --no-dev --optimize-autoloader
+# Exposer le port 9000 pour PHP-FPM
+EXPOSE 9000
 
-# Exposer le port 80 pour Nginx
-EXPOSE 80
-
-# Lancer à la fois Nginx et PHP-FPM
-CMD service nginx start && php-fpm
-#["bash"]
+# Utiliser le script de démarrage
+# Utiliser le script d'entrée comme commande principale
+ENTRYPOINT ["/var/www/docker/script.sh"]

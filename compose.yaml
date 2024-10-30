@@ -2,35 +2,46 @@ version: '3.8'
 
 services:
   symfony:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: lamineur_symfony
+    image: lamineur
     container_name: symfony_app
     volumes:
       - .:/var/www/html
-      - ./docker/nginx:/etc/nginx/conf.d
     depends_on:
       - mysql
+    environment:
+      DATABASE_URL: mysql://root:root@mysql:3306/lamineur
+    networks:
+      - mynetwork
+    restart: always  
+   # command: /var/www/docker/script.sh  # Utiliser le script
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www  
+    depends_on:
+      - symfony
     ports:
       - "8080:80"
-    environment:
-      DATABASE_URL: mysql://root:root@mysql:3306/symfony
     networks:
-      - mynetwork  
+      - mynetwork
+    restart: always  
 
   mysql:
     image: mysql:8.0
     container_name: mysql_db
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: symfony
+      MYSQL_DATABASE: lamineur
     volumes:
       - mysql_data:/var/lib/mysql
     ports:
       - "3307:3306"
     networks:
-      - mynetwork  
+      - mynetwork
+    restart: always  
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -43,10 +54,12 @@ services:
     depends_on:
       - mysql
     networks:
-      - mynetwork  
+      - mynetwork
+    restart: always  
 
 volumes:
   mysql_data:
+
 networks:
   mynetwork:
     driver: bridge

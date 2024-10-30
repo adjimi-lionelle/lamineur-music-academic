@@ -12,7 +12,7 @@ docker-compose.yml
 #/migrations
 
 # Environment configuration files
-.env
+
 .env.test
 
 # PHPUnit test files
@@ -25,5 +25,3 @@ docker-compose.yml
 
 # Miscellaneous auto-generated files
 .htaccess
-composer.lock
-symfony.lock
