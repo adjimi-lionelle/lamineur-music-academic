@@ -1,5 +1,5 @@
 
-# Containerizing a Symfony Web Application
+# Containerizing a Symfony Website
 
 ## Prerequisites
 - **Docker**: A container engine that allows you to create, deploy, and manage applications within containers.
